@@ -2,26 +2,31 @@ package main
 
 import (
 	"fmt"
-
+	"wechat/config"
+	"github.com/spf13/viper"
 	"github.com/gin-gonic/gin"
 	"github.com/silenceper/wechat"
 	"github.com/silenceper/wechat/message"
 )
 
 func main() {
+	if err := config.Init(""); err != nil {
+        panic(err)
+	}
+
 	router := gin.Default()
 
 	router.Any("/", hello)
-	router.Run(":8001")
+	router.Run(":" + viper.GetString("port"))
 }
 
 func hello(c *gin.Context) {
 
 	//配置微信参数
 	config := &wechat.Config{
-		AppID:          "wx05c79371924706da",
-		AppSecret:      "c3a0ba476d2466ff9b53de50ce3f433d",
-		Token:          "abangReadBook",
+		AppID:          viper.GetString("wechat.appid"),
+		AppSecret:      viper.GetString("wechat.secrect"),
+		Token:         	viper.GetString("wechat.token"),
 	}
 	wc := wechat.NewWechat(config)
 
