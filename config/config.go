@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"os"
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 )
@@ -25,8 +26,12 @@ func (c *Config) initConfig() error{
 	if c.Name != "" {
 		viper.SetConfigFile(c.Name)
 	} else {
+		goenv := os.Getenv("GO_ENV")
+		if goenv == "" {
+			goenv = "development"
+		}
 		viper.AddConfigPath("config")
-        viper.SetConfigName("development")
+        viper.SetConfigName(goenv)
 	}
 	viper.SetConfigType("yaml")
 	if err := viper.ReadInConfig(); err != nil {
