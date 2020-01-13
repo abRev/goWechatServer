@@ -8,4 +8,5 @@ import (
 func InitRouters(router *gin.Engine) {
 	homeRouter := router.Group("/home")
 	homeRouter.GET("/:name", home.Home)
+	homeRouter.GET("/:name/value", home.GetValue)
 }
