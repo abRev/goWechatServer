@@ -4,6 +4,7 @@ RUN apk update && apk add --no-cache ca-certificates && \
     ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo "Asia/Shanghai" > /etc/timezone
 
+WORKDIR /go/bin
 
 ADD ./wechatServer /go/bin/wechatServer
 ADD ./config /go/bin/config
