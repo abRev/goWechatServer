@@ -1,9 +1,11 @@
 package home
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"wechat/db/redis"
+	"wechat/db/pg"
 )
 
 func Home(c *gin.Context) {
@@ -43,5 +45,22 @@ func GetValue(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		name: val,
+	})
+}
+
+func SetValue(c *gin.Context) {
+	name := c.Query("name")
+	age := c.Query("age")
+	db := pg.GetDB()
+	result, err := db.Exec(`INSERT INTO user(name,age)`, name, age)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"ok": true,
+		})
+		return
+	}
+	fmt.Println(result)
+	c.JSON(http.StatusOK, gin.H{
+		"ok": false,
 	})
 }

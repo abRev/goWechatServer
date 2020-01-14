@@ -1,11 +1,18 @@
 name: wechatSever
-port: 10086
+port: 80
 common:
-    db:
-        name: db
-        addr: 127.0.0.1:3306
-        username: root
-        password: root
+    pg:
+        host: postgres
+        port: 5432
+        username: postgres
+        password: postgres
+        database: wechat
+        max: 100
+        idle: 10
+    redis:
+        db: 0
+        password: ""
+        addr: redis:6379
 wechat:
     appid: wx05c79371924706da
     secrect: c3a0ba476d2466ff9b53de50ce3f433d
