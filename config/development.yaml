@@ -9,7 +9,7 @@ common:
     redis:
         db: 0
         password: ""
-        addr: localhost:6379
+        addr: redis:6379
 wechat:
     appid: wx05c79371924706da
     secrect: c3a0ba476d2466ff9b53de50ce3f433d
