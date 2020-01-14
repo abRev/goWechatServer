@@ -6,7 +6,7 @@ RUN apk update && apk add --no-cache ca-certificates && \
 
 WORKDIR /go/bin
 
-ADD ./wechatServer /go/bin/wechatServer
+ADD ./dest/wechatServer /go/bin/wechatServer
 ADD ./config /go/bin/config
 
 CMD ["/go/bin/wechatServer"]

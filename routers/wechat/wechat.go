@@ -6,6 +6,6 @@ import (
 )
 
 func InitRouters(router *gin.Engine) {
-	wechatRouter := router.Group("/official")
-	wechatRouter.Any("/",wechat.Hello)
+	// wechatRouter := router.Group("/official")
+	router.Any("/official",wechat.Hello)
 }

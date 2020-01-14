@@ -6,15 +6,21 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/silenceper/wechat"
 	"github.com/silenceper/wechat/message"
+	"github.com/silenceper/wechat/cache"
 )
 
 
 func Hello(c *gin.Context) {
+	opts := &cache.RedisOpts{
+		Host: viper.GetString("common.redis.addr"),
+	}
+	cacheRedis := cache.NewRedis(opts)
 	//配置微信参数
 	config := &wechat.Config{
 		AppID:          viper.GetString("wechat.appid"),
 		AppSecret:      viper.GetString("wechat.secrect"),
 		Token:         	viper.GetString("wechat.token"),
+		Cache:			cacheRedis,
 	}
 	wc := wechat.NewWechat(config)
 
