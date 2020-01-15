@@ -2,11 +2,12 @@ package home
 
 import (
 	"fmt"
-	"strconv"
+	// "strconv"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"wechat/db/redis"
 	"wechat/db/pg"
+	"wechat/model/user"
 )
 
 func Home(c *gin.Context) {
@@ -50,9 +51,16 @@ func GetValue(c *gin.Context) {
 }
 
 func SetValue(c *gin.Context) {
-	name := c.Query("name")
-	ageStr := c.Query("age")
-	age,err:= strconv.Atoi(ageStr)
+	userJson := &user.UserBody{}
+	if err:= c.ShouldBindJSON(&userJson); err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"ok": false,
+			"message": err,
+		})
+		return
+	}
+	name := userJson.Name
+	age := userJson.Age
 	db := pg.GetDB()
 	if db == nil {
 		c.JSON(http.StatusOK, gin.H{
