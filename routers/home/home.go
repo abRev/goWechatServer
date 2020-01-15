@@ -7,6 +7,7 @@ import (
 
 func InitRouters(router *gin.Engine) {
 	homeRouter := router.Group("/home")
-	homeRouter.GET("/:name", home.Home)
-	homeRouter.GET("/:name/value", home.GetValue)
+	homeRouter.GET("/set/:name", home.Home)
+	homeRouter.GET("/set/:name/value", home.GetValue)
+	homeRouter.GET("/pgset", home.SetValue)
 }

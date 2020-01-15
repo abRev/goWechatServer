@@ -8,9 +8,8 @@ else
   tag="$1"
 fi
 
-docker rmi wechat_server:$tag
 
 CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o ./dest/wechatServer .;
 docker build -t abang/go_wechat_server:$tag .
-docker push abang/go_wechat_server:$tag
+# docker push abang/go_wechat_server:$tag
 echo "build success."
