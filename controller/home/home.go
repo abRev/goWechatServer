@@ -171,7 +171,7 @@ func LearnTx(c *gin.Context) {
 		})
 	}
 	moneyDB := &money.Money{}
-	if err:= db.Select(moneyDB,`SELECT * FROM "moneys" WHERE "user"=$1`, fromUser); err != nil {
+	if err:= db.Get(moneyDB,`SELECT * FROM "moneys" WHERE "user"=$1`, fromUser); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"ok": false,
 			"message": err,
@@ -190,13 +190,23 @@ func LearnTx(c *gin.Context) {
 	if err != nil {
 		fmt.Println("事务开始失败了")
 	}
-	if _, err:= tx.Exec(`UPDATE "moneys" SET count = count-$1 WHERE $2`, moneyTo, fromUser); err != nil{
+	if _, err:= tx.Exec(`UPDATE "moneys" SET count = count-$1 WHERE "user"=$2`, moneyTo, fromUser); err != nil{
 		fmt.Println(err);
 		tx.Rollback()
+		c.JSON(http.StatusOK, gin.H{
+			"ok": false,
+			"message": "操作失败请重试",
+		})
+		return
 	}
-	if _, err:= tx.Exec(`UPDATE "moneys" SET count = count+$1 WHERE $2`, moneyTo, toUser); err != nil{
+	if _, err:= tx.Exec(`UPDATE "moneys" SET count = count+$1 WHERE "user"=$2`, moneyTo, toUser); err != nil{
 		fmt.Println(err);
 		tx.Rollback()
+		c.JSON(http.StatusOK, gin.H{
+			"ok": false,
+			"message": "操作失败请重试",
+		})
+		return
 	}
 	if err := tx.Commit(); err != nil {
 		fmt.Println("事务结束失败了")
