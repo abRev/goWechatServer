@@ -1,0 +1,25 @@
+version: '2.2'
+services:
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - 6379:6379
+    networks:
+      - goWechat
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ./data/pg:/var/lib/postgresql/data
+    networks:
+      - goWechat
+
+networks:
+  goWechat:
+    driver: bridge
