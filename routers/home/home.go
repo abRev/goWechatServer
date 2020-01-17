@@ -12,5 +12,5 @@ func InitRouters(router *gin.Engine) {
 	homeRouter.POST("/pg/user", home.SetValue)
 	homeRouter.GET("/pg/users", home.GetUserList)
 	homeRouter.GET("/pg/queryx", home.LearnQueryx)
-	homeRouter.GET("/pg/tx", home.LearnTx)
+	homeRouter.POST("/pg/tx", home.LearnTx)
 }

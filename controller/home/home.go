@@ -8,7 +8,14 @@ import (
 	"wechat/db/redis"
 	"wechat/db/pg"
 	"wechat/model/user"
+	"wechat/model/money"
 )
+
+type BodyJSON struct {
+	From string `json:"from" binding:"required"`
+	To string `json:"to" binding:"required"`
+	Money float32 `json:"money" binding:"required"`
+}
 
 func Home(c *gin.Context) {
 	name := c.Param("name")
@@ -145,6 +152,17 @@ func LearnQueryx(c *gin.Context) {
 }
 
 func LearnTx(c *gin.Context) {
+	bodyJSON := &BodyJSON{}
+	if err := c.ShouldBindJSON(&bodyJSON); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"ok": false,
+			"message": "参数传递错误",
+		})
+	}
+	fromUser := bodyJSON.From
+	toUser := bodyJSON.To
+	moneyTo := bodyJSON.Money
+
 	db := pg.GetDB()
 	if db == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -152,15 +170,33 @@ func LearnTx(c *gin.Context) {
 			"message": "数据库失联了",
 		})
 	}
+	moneyDB := &money.Money{}
+	if err:= db.Select(moneyDB,`SELECT * FROM "moneys" WHERE "user"=$1`, fromUser); err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"ok": false,
+			"message": err,
+		})
+		return;
+	}
+	if moneyDB.Count < moneyTo {
+		c.JSON(http.StatusOK, gin.H{
+			"ok": false,
+			"message": "余额不足",
+		})
+		return;
+	}
+
 	tx,err := db.Beginx()
 	if err != nil {
 		fmt.Println("事务开始失败了")
 	}
-	if result,err:= tx.Exec(`UPDATE "weather" SET temp_lo=temp_lo+1 WHERE temp_lo<40`); err !=nil {
-		fmt.Println("修改失败了",result);
+	if _, err:= tx.Exec(`UPDATE "moneys" SET count = count-$1 WHERE $2`, moneyTo, fromUser); err != nil{
+		fmt.Println(err);
+		tx.Rollback()
 	}
-	if result,err:= tx.Exec(`UPDATE "weather" SET temp_lo=temp_lo+1 WHERE temp_lo<40`); err !=nil {
-		fmt.Println("修改失败了",result);
+	if _, err:= tx.Exec(`UPDATE "moneys" SET count = count+$1 WHERE $2`, moneyTo, toUser); err != nil{
+		fmt.Println(err);
+		tx.Rollback()
 	}
 	if err := tx.Commit(); err != nil {
 		fmt.Println("事务结束失败了")
