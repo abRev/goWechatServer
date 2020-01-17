@@ -114,6 +114,9 @@ func LearnQueryx(c *gin.Context) {
 		})
 	}
 	sql := `SELECT * FROM "user"`
+	// 创建查询对象，返回sql.Rows对象 对象有多种方法
+	// https://godoc.org/github.com/jmoiron/sqlx#Rows
+	// https://golang.org/pkg/database/sql/#Rows
 	rows,err := db.Queryx(sql)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -121,13 +124,20 @@ func LearnQueryx(c *gin.Context) {
 			"message": "查询失败了",
 		})
 	}
+	// 查询表的所有列名
 	strs,err := rows.Columns()
 	for i, str := range strs {
 		fmt.Println(i, str)
 	}
 	userDB := &user.UserDB{}
-	if err:= rows.Scan(userDB); err !=nil {
-		fmt.Println("Scan: ",*userDB)
+	for rows.Next() {
+		// 依次打印所有行的内容
+		if err:= rows.Scan(&userDB.Name, &userDB.Age); err == nil {
+			fmt.Println("Scan: ", *userDB)
+		}
+	}
+	if err:= rows.Close(); err != nil {
+		fmt.Println("Close rows err: ", err)
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"ok": true,
