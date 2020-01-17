@@ -1,0 +1,19 @@
+name: wechatSever
+port: 10086
+common:
+    pg:
+        host: localhost
+        port: 5432
+        username: postgres
+        password: postgres
+        database: wechat
+        max: 100
+        idle: 10
+    redis:
+        db: 0
+        password: ""
+        addr: localhost:6379
+wechat:
+    appid: wx05c79371924706da
+    secrect: c3a0ba476d2466ff9b53de50ce3f433d
+    token: abangReadBook
