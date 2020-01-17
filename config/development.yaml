@@ -1,8 +1,8 @@
 name: wechatSever
-port: 80
+port: 10088
 common:
     pg:
-        host: postgres
+        host: localhost
         port: 5432
         username: postgres
         password: postgres
@@ -12,7 +12,7 @@ common:
     redis:
         db: 0
         password: ""
-        addr: redis:6379
+        addr: localhost:6379
 wechat:
     appid: wx05c79371924706da
     secrect: c3a0ba476d2466ff9b53de50ce3f433d

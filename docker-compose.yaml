@@ -19,6 +19,20 @@ services:
       - ./data/pg:/var/lib/postgresql/data
     networks:
       - goWechat
+  go_wechat_server:
+    image: abang/go_wechat_server:compose
+    # 以下这种方式为从dockerfile来打包启动
+    # build:
+    #   context: ./
+    #   dockerfile: Dockerfile
+    container_name: go_wechat_server_compose
+    ports:
+      - 10086:10086
+    environment:
+      - GO_ENV=compose
+    networks:
+      - goWechat
+    restart: always
 
 networks:
   goWechat:
