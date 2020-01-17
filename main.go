@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"wechat/routers"
 	"wechat/db/redis"
+	"wechat/db/pg"
 )
 
 func main() {
@@ -13,6 +14,9 @@ func main() {
         panic(err)
 	}
 	if err := redis.Init(); err != nil {
+		panic(err)
+	}
+	if err := pg.Init(); err != nil {
 		panic(err)
 	}
 	router := gin.Default()

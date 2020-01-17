@@ -2,7 +2,7 @@ package home
 
 import (
 	"fmt"
-	// "strconv"
+	// "strconv"  // 类型转换使用
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"wechat/db/redis"
@@ -81,3 +81,82 @@ func SetValue(c *gin.Context) {
 		"ok": false,
 	})
 }
+
+func GetUserList(c *gin.Context) {
+	db:= pg.GetDB();
+	if db == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"ok": false,
+			"message": "数据库失联了",
+		})
+	}
+	userDBs := &[]user.UserDB{}
+	sql := `SELECT * FROM "user"`
+	err := db.Select(userDBs, sql)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"ok": false,
+			"message": "查询失败了",
+		})
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"ok": true,
+		"users": userDBs,
+	})
+}
+
+func LearnQueryx(c *gin.Context) {
+	db := pg.GetDB()
+	if db == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"ok": false,
+			"message": "数据库失联了",
+		})
+	}
+	sql := `SELECT * FROM "user"`
+	rows,err := db.Queryx(sql)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"ok": false,
+			"message": "查询失败了",
+		})
+	}
+	strs,err := rows.Columns()
+	for i, str := range strs {
+		fmt.Println(i, str)
+	}
+	userDB := &user.UserDB{}
+	if err:= rows.Scan(userDB); err !=nil {
+		fmt.Println("Scan: ",*userDB)
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"ok": true,
+	})
+}
+
+func LearnTx(c *gin.Context) {
+	db := pg.GetDB()
+	if db == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"ok": false,
+			"message": "数据库失联了",
+		})
+	}
+	tx,err := db.Beginx()
+	if err != nil {
+		fmt.Println("事务开始失败了")
+	}
+	if result,err:= tx.Exec(`UPDATE "weather" SET temp_lo=temp_lo+1 WHERE temp_lo<40`); err !=nil {
+		fmt.Println("修改失败了",result);
+	}
+	if result,err:= tx.Exec(`UPDATE "weather" SET temp_lo=temp_lo+1 WHERE temp_lo<40`); err !=nil {
+		fmt.Println("修改失败了",result);
+	}
+	if err := tx.Commit(); err != nil {
+		fmt.Println("事务结束失败了")
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"ok": true,
+	})
+}
+

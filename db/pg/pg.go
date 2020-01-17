@@ -7,12 +7,9 @@ import (
 	"github.com/spf13/viper"
 )
 
-var db *sqlx.DB
+var dbCon *sqlx.DB
 
-func GetDB() *sqlx.DB {
-	if db != nil {
-		return db
-	}
+func Init() error {
 	host := viper.GetString("common.pg.host")
 	port := viper.GetString("common.pg.port")
 	user := viper.GetString("common.pg.username")
@@ -21,8 +18,19 @@ func GetDB() *sqlx.DB {
 	max := viper.GetInt("common.pg.max")
 	idle := viper.GetInt("common.pg.idle")
 	dataSourceName := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", user, password, host, port, database)
-	db = sqlx.MustConnect("postgres", dataSourceName)
+	db,err := sqlx.Connect("postgres", dataSourceName)
+	if err != nil {
+		return err
+	}
+	dbCon = db
 	db.SetMaxIdleConns(idle)
 	db.SetMaxOpenConns(max)
-	return db
+	return nil
+}
+
+func GetDB() *sqlx.DB {
+	if dbCon != nil {
+		return dbCon
+	}
+	return nil
 }
