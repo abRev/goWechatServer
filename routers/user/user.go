@@ -1,0 +1,34 @@
+package user
+
+import (
+	"fmt"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-gonic/gin"
+	"net/http"
+	"wechat/controller/user"
+)
+
+// 校验token，不太好用
+func validate() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		session := sessions.Default(c)
+		fmt.Println(session)
+		v := session.Get("count")
+		if v == nil {
+			c.Abort()
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"message": "session 验证失败",
+			})
+		} else {
+			c.Next()
+		}
+	}
+}
+func InitRouters(router *gin.Engine) {
+	store := cookie.NewStore([]byte("secret"))
+	router.Use(sessions.Sessions("mysession", store))
+	userRouter := router.Group("/user")
+	userRouter.Use(validate())
+	userRouter.GET("/info", user.GetUserInfo)
+}

@@ -44,12 +44,14 @@ func GetValue(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "no db",
 		})
+		return
 	}
 	val, err := client.Get(name).Result()
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"message": err,
 		})
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{
 		name: val,
