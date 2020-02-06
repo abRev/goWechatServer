@@ -5,8 +5,9 @@ import (
 	"wechat/controller/home"
 )
 
-func InitRouters(router *gin.Engine) {
+func InitRouters(router *gin.Engine, middleware gin.HandlerFunc) {
 	homeRouter := router.Group("/home")
+	homeRouter.Use(middleware)
 	homeRouter.GET("/redis/set/:name", home.Home)
 	homeRouter.GET("/redis/set/:name/value", home.GetValue)
 	homeRouter.POST("/pg/user", home.SetValue)
