@@ -5,15 +5,15 @@ import (
 	// "strconv"  // 类型转换使用
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"wechat/db/redis"
 	"wechat/db/pg"
-	"wechat/model/user"
+	"wechat/db/redis"
 	"wechat/model/money"
+	"wechat/model/user"
 )
 
 type BodyJSON struct {
-	From string `json:"from" binding:"required"`
-	To string `json:"to" binding:"required"`
+	From  string  `json:"from" binding:"required"`
+	To    string  `json:"to" binding:"required"`
 	Money float32 `json:"money" binding:"required"`
 }
 
@@ -37,7 +37,6 @@ func Home(c *gin.Context) {
 	})
 }
 
-
 func GetValue(c *gin.Context) {
 	name := c.Param("name")
 	client := redis.GetDB()
@@ -59,9 +58,9 @@ func GetValue(c *gin.Context) {
 
 func SetValue(c *gin.Context) {
 	userJson := &user.UserBody{}
-	if err:= c.ShouldBindJSON(&userJson); err != nil {
+	if err := c.ShouldBindJSON(&userJson); err != nil {
 		c.JSON(http.StatusOK, gin.H{
-			"ok": false,
+			"ok":      false,
 			"message": err,
 		})
 		return
@@ -75,7 +74,7 @@ func SetValue(c *gin.Context) {
 		})
 		return
 	}
-	result, err:= db.Exec(`INSERT INTO "user"("name","age") VALUES($1, $2)`, name, age)
+	result, err := db.Exec(`INSERT INTO "user"("name","age") VALUES($1, $2)`, name, age)
 	fmt.Println(result)
 	if err == nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -90,10 +89,10 @@ func SetValue(c *gin.Context) {
 }
 
 func GetUserList(c *gin.Context) {
-	db:= pg.GetDB();
+	db := pg.GetDB()
 	if db == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"ok": false,
+			"ok":      false,
 			"message": "数据库失联了",
 		})
 	}
@@ -102,12 +101,12 @@ func GetUserList(c *gin.Context) {
 	err := db.Select(userDBs, sql)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"ok": false,
+			"ok":      false,
 			"message": "查询失败了",
 		})
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"ok": true,
+		"ok":    true,
 		"users": userDBs,
 	})
 }
@@ -116,7 +115,7 @@ func LearnQueryx(c *gin.Context) {
 	db := pg.GetDB()
 	if db == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"ok": false,
+			"ok":      false,
 			"message": "数据库失联了",
 		})
 	}
@@ -124,26 +123,26 @@ func LearnQueryx(c *gin.Context) {
 	// 创建查询对象，返回sql.Rows对象 对象有多种方法
 	// https://godoc.org/github.com/jmoiron/sqlx#Rows
 	// https://golang.org/pkg/database/sql/#Rows
-	rows,err := db.Queryx(sql)
+	rows, err := db.Queryx(sql)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"ok": false,
+			"ok":      false,
 			"message": "查询失败了",
 		})
 	}
 	// 查询表的所有列名
-	strs,err := rows.Columns()
+	strs, err := rows.Columns()
 	for i, str := range strs {
 		fmt.Println(i, str)
 	}
 	userDB := &user.UserDB{}
 	for rows.Next() {
 		// 依次打印所有行的内容
-		if err:= rows.Scan(&userDB.Name, &userDB.Age); err == nil {
+		if err := rows.Scan(&userDB.Name, &userDB.Age); err == nil {
 			fmt.Println("Scan: ", *userDB)
 		}
 	}
-	if err:= rows.Close(); err != nil {
+	if err := rows.Close(); err != nil {
 		fmt.Println("Close rows err: ", err)
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -155,7 +154,7 @@ func LearnTx(c *gin.Context) {
 	bodyJSON := &BodyJSON{}
 	if err := c.ShouldBindJSON(&bodyJSON); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"ok": false,
+			"ok":      false,
 			"message": "参数传递错误",
 		})
 	}
@@ -166,44 +165,53 @@ func LearnTx(c *gin.Context) {
 	db := pg.GetDB()
 	if db == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"ok": false,
+			"ok":      false,
 			"message": "数据库失联了",
 		})
 	}
 	moneyDB := &money.Money{}
-	if err:= db.Get(moneyDB,`SELECT * FROM "moneys" WHERE "user"=$1`, fromUser); err != nil {
+	if err := db.Get(moneyDB, `SELECT * FROM "moneys" WHERE "user"=$1`, fromUser); err != nil {
 		c.JSON(http.StatusOK, gin.H{
-			"ok": false,
+			"ok":      false,
 			"message": err,
 		})
-		return;
+		return
 	}
+	// if moneyDB == nil {
+	// 	if _, err := db.Exec(`INSERT INTO "moneys"("user", "count") VALUES($1,$2)`, fromUser, 0); err != nil {
+	// 		fmt.Println(err)
+	// 		c.JSON(http.StatusOK, gin.H{
+	// 			"ok":      false,
+	// 			"message": "创建用户初始化数据失败",
+	// 		})
+	// 	}
+	// }
 	if moneyDB.Count < moneyTo {
 		c.JSON(http.StatusOK, gin.H{
-			"ok": false,
+			"ok":      false,
 			"message": "余额不足",
 		})
-		return;
+		return
 	}
-
-	tx,err := db.Beginx()
+	// 事务开始
+	tx, err := db.Beginx()
 	if err != nil {
 		fmt.Println("事务开始失败了")
 	}
-	if _, err:= tx.Exec(`UPDATE "moneys" SET count = count-$1 WHERE "user"=$2`, moneyTo, fromUser); err != nil{
-		fmt.Println(err);
+	if _, err := tx.Exec(`UPDATE "moneys" SET count = count-$1 WHERE "user"=$2`, moneyTo, fromUser); err != nil {
+		fmt.Println(err)
 		tx.Rollback()
 		c.JSON(http.StatusOK, gin.H{
-			"ok": false,
+			"ok":      false,
 			"message": "操作失败请重试",
 		})
 		return
 	}
-	if _, err:= tx.Exec(`UPDATE "moneys" SET count = count+$1 WHERE "user"=$2`, moneyTo, toUser); err != nil{
-		fmt.Println(err);
+	if _, err := tx.Exec(`UPDATE "moneys" SET count = count+$1 WHERE "user"=$2`, moneyTo, toUser); err != nil {
+		fmt.Println(err)
 		tx.Rollback()
 		c.JSON(http.StatusOK, gin.H{
-			"ok": false,
+			"ok":      false,
 			"message": "操作失败请重试",
 		})
 		return
@@ -211,8 +219,8 @@ func LearnTx(c *gin.Context) {
 	if err := tx.Commit(); err != nil {
 		fmt.Println("事务结束失败了")
 	}
+	// 事务提交
 	c.JSON(http.StatusOK, gin.H{
 		"ok": true,
 	})
 }
-
