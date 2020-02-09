@@ -18,7 +18,8 @@ func Login(c *gin.Context) {
 		db := pg.GetDB()
 		if db == nil {
 			c.JSON(http.StatusOK, gin.H{
-				"ok": false,
+				"ok":  false,
+				"msg": "数据库连接失败",
 			})
 			return
 		}
@@ -29,6 +30,7 @@ func Login(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{
 				"ok":  false,
 				"msg": "未查询到当前用户，请注册",
+				"err": err.Error(),
 			})
 		} else {
 			// 查询成功判断密码是否正确
@@ -55,7 +57,7 @@ func generateToken(c *gin.Context, userInfo user.UserDB) {
 		SigningKey: []byte("newAbang"),
 	}
 	claims := jwt.CustomClaims{
-		ID:    "01234",
+		ID:    userInfo.Id,
 		Name:  userInfo.Name,
 		Phone: userInfo.Phone,
 		StandardClaims: jwtgo.StandardClaims{
@@ -82,5 +84,33 @@ func generateToken(c *gin.Context, userInfo user.UserDB) {
 }
 
 func Register(c *gin.Context) {
+	userInfo := &user.UserBody{}
+	if c.BindJSON(userInfo) == nil {
+		db := pg.GetDB()
+		if db == nil {
+			c.JSON(http.StatusOK, gin.H{
+				"ok":  false,
+				"msg": "数据库连接失败",
+			})
+			return
+		}
+		if _, err := db.Exec(`INSERT INTO "user"("name","age","phone","password") VALUES ($1,$2,$3,$4)`,
+			userInfo.Name, userInfo.Age, userInfo.Phone, userInfo.Password); err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"ok":  false,
+				"msg": "插入数据失败",
+			})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"ok":  true,
+			"msg": "注册成功，请登录",
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"status": -1,
+			"msg":    "json 解析失败",
+		})
+	}
 
 }

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"wechat/db/pg"
 	"wechat/db/redis"
+	jwt "wechat/middleware/jwt"
 	"wechat/model/money"
 	"wechat/model/user"
 )
@@ -38,7 +39,9 @@ func Home(c *gin.Context) {
 }
 
 func GetValue(c *gin.Context) {
-	name := c.Param("name")
+	claims := c.MustGet("claims").(*jwt.CustomClaims)
+	fmt.Println(*claims)
+	name := claims.Name
 	client := redis.GetDB()
 	if client == nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -50,6 +53,7 @@ func GetValue(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"message": err,
+			"extra":   *claims,
 		})
 		return
 	}
