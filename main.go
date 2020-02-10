@@ -1,17 +1,18 @@
 package main
 
 import (
-	"wechat/config"
-	"github.com/spf13/viper"
 	"github.com/gin-gonic/gin"
-	"wechat/routers"
-	"wechat/db/redis"
+	"github.com/spf13/viper"
+	"wechat/config"
+	"wechat/db/es"
 	"wechat/db/pg"
+	"wechat/db/redis"
+	"wechat/routers"
 )
 
 func main() {
 	if err := config.Init(""); err != nil {
-        panic(err)
+		panic(err)
 	}
 	if err := redis.Init(); err != nil {
 		panic(err)
@@ -19,8 +20,10 @@ func main() {
 	if err := pg.Init(); err != nil {
 		panic(err)
 	}
+	if err := es.Init(); err != nil {
+		panic(err)
+	}
 	router := gin.Default()
 	routers.InitRouters(router)
 	router.Run(":" + viper.GetString("port"))
 }
-

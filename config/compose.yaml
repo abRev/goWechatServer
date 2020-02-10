@@ -13,6 +13,9 @@ common:
         db: 0
         password: ""
         addr: redis:6379
+    es:
+        db: elasticsearch
+        port: 9200
 wechat:
     appid: wx05c79371924706da
     secrect: c3a0ba476d2466ff9b53de50ce3f433d
