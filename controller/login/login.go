@@ -94,11 +94,28 @@ func Register(c *gin.Context) {
 			})
 			return
 		}
+		userDB := &user.UserDB{}
+		if err := db.Get(userDB, `SELECT * FROM "user" WHERE "phone"=$1`, userInfo.Phone); err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"ok":  false,
+				"msg": "查询数据库失败",
+				"err": err.Error(),
+			})
+			return
+		}
+		if userDB != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"ok":  false,
+				"msg": "手机号已经使用",
+			})
+			return
+		}
 		if _, err := db.Exec(`INSERT INTO "user"("name","age","phone","password") VALUES ($1,$2,$3,$4)`,
 			userInfo.Name, userInfo.Age, userInfo.Phone, userInfo.Password); err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"ok":  false,
 				"msg": "插入数据失败",
+				"err": err.Error(),
 			})
 			return
 		}

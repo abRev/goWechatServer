@@ -62,6 +62,14 @@ func GetValue(c *gin.Context) {
 	})
 }
 
+func Stats(c *gin.Context) {
+	db := pg.GetDB()
+	status := db.Stats()
+	c.JSON(http.StatusOK, gin.H{
+		"status": status,
+	})
+}
+
 func SetValue(c *gin.Context) {
 	userJson := &user.UserBody{}
 	if err := c.ShouldBindJSON(&userJson); err != nil {
@@ -143,9 +151,12 @@ func LearnQueryx(c *gin.Context) {
 	}
 	userDB := &user.UserDB{}
 	for rows.Next() {
+		fmt.Println("-----")
 		// 依次打印所有行的内容
-		if err := rows.Scan(&userDB.Name, &userDB.Age); err == nil {
+		if err := rows.Scan(&userDB.Id, &userDB.Age, &userDB.Name, &userDB.Phone, &userDB.Password); err == nil {
 			fmt.Println("Scan: ", *userDB)
+		} else {
+			fmt.Println("err: ", err)
 		}
 	}
 	if err := rows.Close(); err != nil {
@@ -229,4 +240,16 @@ func LearnTx(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"ok": true,
 	})
+}
+
+func GetFile(c *gin.Context) {
+	filename := c.Param("filename")
+	fmt.Println(" : ", filename)
+	if filename == "" {
+		c.JSON(http.StatusNotFound, gin.H{
+			"ok": false,
+		})
+		return
+	}
+	c.String(http.StatusOK, filename)
 }
