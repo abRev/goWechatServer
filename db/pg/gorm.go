@@ -2,15 +2,18 @@ package pg
 
 import (
 	"fmt"
-
+	"log"
+	"os"
 	_ "wechat/config"
 
-	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/spf13/viper"
 )
 
-var dbCon *sqlx.DB
+var (
+	DB *gorm.DB
+)
 
 func init() {
 	dialect := viper.GetString("common.pg.dialect")
@@ -21,20 +24,16 @@ func init() {
 	database := viper.GetString("common.pg.database")
 	max := viper.GetInt("common.pg.max")
 	idle := viper.GetInt("common.pg.idle")
-	dataSourceName := fmt.Sprintf("%s://%s:%s@%s:%s/%s?sslmode=disable", dialect, user, password, host, port, database)
-	db, err := sqlx.Connect(dialect, dataSourceName)
+	dataSourceName := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable", host, port, user, database, password)
+	db, err := gorm.Open(dialect, dataSourceName)
 	if err != nil {
 		panic(err)
 	}
-	db.SetMaxIdleConns(idle)
-	db.SetMaxOpenConns(max)
-	dbCon = db
-}
-
-// GetDB 获取数据库链接
-func GetDB() *sqlx.DB {
-	if dbCon != nil {
-		return dbCon
+	if goenv := os.Getenv("GO_ENV"); goenv == "development" {
+		db.LogMode(true)
 	}
-	return nil
+	db.DB().SetMaxOpenConns(max)
+	db.DB().SetMaxIdleConns(idle)
+	DB = db
+	log.Println("pg: gorm: " + host + ":" + port)
 }

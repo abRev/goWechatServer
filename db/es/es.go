@@ -2,16 +2,19 @@ package es
 
 import (
 	"crypto/tls"
-	"github.com/elastic/go-elasticsearch"
-	"github.com/spf13/viper"
 	"net"
 	"net/http"
 	"time"
+
+	_ "wechat/config"
+
+	"github.com/elastic/go-elasticsearch"
+	"github.com/spf13/viper"
 )
 
 var es *elasticsearch.Client
 
-func Init() error {
+func init() {
 	cfg := elasticsearch.Config{
 		Addresses: []string{
 			viper.GetString("common.es.db") + ":" + viper.GetString("common.es.port"),
@@ -28,12 +31,12 @@ func Init() error {
 
 	esCon, err := elasticsearch.NewClient(cfg)
 	if err != nil {
-		return err
+		panic(err)
 	}
 	es = esCon
-	return nil
 }
 
+// GetES 获取es实例
 func GetES() *elasticsearch.Client {
 	if es != nil {
 		return es

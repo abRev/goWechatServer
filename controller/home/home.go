@@ -2,14 +2,18 @@ package home
 
 import (
 	"fmt"
+	"time"
+
 	// "strconv"  // 类型转换使用
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"wechat/db/pg"
 	"wechat/db/redis"
 	jwt "wechat/middleware/jwt"
 	"wechat/model/money"
 	"wechat/model/user"
+	"wechat/modelgorm"
+
+	"github.com/gin-gonic/gin"
 )
 
 type BodyJSON struct {
@@ -35,6 +39,26 @@ func Home(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "save",
+	})
+}
+
+func CreateHome(c *gin.Context) {
+	home := modelgorm.Home{
+		Title:    "十二德堡",
+		Birthday: time.Now(),
+		Email:    "f@163.com",
+	}
+	ok := pg.DB.Create(&home)
+	c.JSON(http.StatusOK, gin.H{
+		"ok": ok,
+	})
+}
+
+func ListHome(c *gin.Context) {
+	homes := []modelgorm.Home{}
+	pg.DB.Find(&homes)
+	c.JSON(http.StatusOK, gin.H{
+		"homes": homes,
 	})
 }
 

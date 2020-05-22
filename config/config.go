@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 )
@@ -11,18 +12,17 @@ type Config struct {
 	Name string
 }
 
-func Init(cfg string) error {
+func init() {
 	c := Config{
-		Name: cfg,
+		Name: "",
 	}
 	if err := c.initConfig(); err != nil {
-		return err
+		panic(err)
 	}
 	c.watchConfig()
-	return nil
 }
 
-func (c *Config) initConfig() error{
+func (c *Config) initConfig() error {
 	if c.Name != "" {
 		viper.SetConfigFile(c.Name)
 	} else {
@@ -31,7 +31,7 @@ func (c *Config) initConfig() error{
 			goenv = "development"
 		}
 		viper.AddConfigPath("config")
-        viper.SetConfigName(goenv)
+		viper.SetConfigName(goenv)
 	}
 	viper.SetConfigType("yaml")
 	if err := viper.ReadInConfig(); err != nil {
@@ -43,6 +43,6 @@ func (c *Config) initConfig() error{
 func (c *Config) watchConfig() {
 	viper.WatchConfig()
 	viper.OnConfigChange(func(e fsnotify.Event) {
-        fmt.Printf("Config file changed: %s\n", e.Name)
-    })
+		fmt.Printf("Config file changed: %s\n", e.Name)
+	})
 }

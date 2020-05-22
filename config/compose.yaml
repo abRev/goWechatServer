@@ -2,11 +2,12 @@ name: wechatSever
 port: 10086
 common:
     pg:
+        dialect: postgres
         host: postgres
         port: 5432
         username: postgres
         password: postgres
-        database: wechat
+        database: postgres
         max: 100
         idle: 10
     redis:
