@@ -8,7 +8,7 @@ import (
 
 func InitRouters(router *gin.Engine, middleware gin.HandlerFunc) {
 	homeRouter := router.Group("/home")
-	// homeRouter.Use(middleware)
+	homeRouter.Use(middleware)
 	homeRouter.GET("/redis/set/:name", home.Home)
 	homeRouter.GET("/redis/value", home.GetValue)
 	homeRouter.GET("/stats", home.Stats)
