@@ -6,9 +6,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func InitRouters(router *gin.Engine, middleware gin.HandlerFunc) {
+func InitRouters(router *gin.Engine, middleware1 gin.HandlerFunc, middleware gin.HandlerFunc) {
 	homeRouter := router.Group("/home")
-	homeRouter.Use(middleware)
+	homeRouter.Use(middleware1)
+	// homeRouter.Use(middleware)
 	homeRouter.GET("/redis/set/:name", home.Home)
 	homeRouter.GET("/redis/value", home.GetValue)
 	homeRouter.GET("/stats", home.Stats)

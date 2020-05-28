@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"wechat/middleware"
 	"wechat/middleware/jwt"
 	"wechat/routers/home"
 	"wechat/routers/login"
@@ -15,6 +16,6 @@ func InitRouters(router *gin.Engine) {
 	login.InitRouter(router)
 	wechat.InitRouters(router)
 	user.InitRouters(router)
-	home.InitRouters(router, jwt.JWTAuth())
+	home.InitRouters(router, middleware.IpRateLimit(), jwt.JWTAuth())
 	search.InitRouters(router)
 }
