@@ -3,3 +3,5 @@
 /data/redis/
 /data/mongo/
 /data/es/
+
+/go.sum

@@ -18,4 +18,5 @@ func InitRouters(router *gin.Engine) {
 	user.InitRouters(router)
 	home.InitRouters(router, middleware.IpRateLimit(), jwt.JWTAuth())
 	search.InitRouters(router)
+	InitRedisRouter(router)
 }
