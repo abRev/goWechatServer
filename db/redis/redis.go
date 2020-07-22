@@ -5,7 +5,7 @@ import (
 
 	_ "wechat/config"
 
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v7"
 	"github.com/spf13/viper"
 )
 

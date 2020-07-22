@@ -3,7 +3,7 @@ package lib
 import (
 	cache "wechat/db/redis"
 
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v7"
 )
 
 type Bloom struct {
@@ -41,7 +41,7 @@ func (bl *Bloom) Exists(member string) (int64, error) {
 	}
 }
 
-func (bl *Bloom) MAdd(members []string) (int64, error) {
+func (bl *Bloom) MAdd(members []string) ([]int64, error) {
 	client := cache.GetDB()
 	args := make([]interface{}, 2+len(members))
 	args[0] = "BF.MADD"
@@ -51,9 +51,9 @@ func (bl *Bloom) MAdd(members []string) (int64, error) {
 	}
 	cmd := redis.NewIntSliceCmd(args...)
 	client.Process(cmd)
-	if count, err := cmd.Result(); err != nil {
-		return 0, err
+	if resultArr, err := cmd.Result(); err != nil {
+		return []int64{}, err
 	} else {
-		return count, nil
+		return resultArr, nil
 	}
 }

@@ -6,35 +6,32 @@ require (
 	github.com/bradfitz/gomemcache v0.0.0-20190913173617-a41fca850d0b // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/elastic/go-elasticsearch v0.0.0
-	github.com/fsnotify/fsnotify v1.4.7
+	github.com/fsnotify/fsnotify v1.4.9
 	github.com/gin-contrib/sessions v0.0.3
-	github.com/gin-gonic/gin v1.5.0
-	github.com/go-playground/universal-translator v0.17.0 // indirect
-	github.com/go-redis/redis v6.15.8+incompatible
-	github.com/golang/protobuf v1.3.5 // indirect
-	github.com/jinzhu/gorm v1.9.12
+	github.com/gin-gonic/gin v1.6.3
+	github.com/go-playground/validator/v10 v10.3.0 // indirect
+	github.com/go-redis/redis v6.15.8+incompatible // indirect
+	github.com/go-redis/redis/v7 v7.4.0
+	github.com/golang/protobuf v1.4.2 // indirect
+	github.com/gorilla/sessions v1.2.0 // indirect
+	github.com/jinzhu/gorm v1.9.15
 	github.com/jmoiron/sqlx v1.2.0
-	github.com/json-iterator/go v1.1.9 // indirect
-	github.com/leodido/go-urn v1.2.0 // indirect
-	github.com/lib/pq v1.5.2
-	github.com/mattn/go-isatty v0.0.11 // indirect
-	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
-	github.com/modern-go/reflect2 v1.0.1 // indirect
+	github.com/json-iterator/go v1.1.10 // indirect
+	github.com/lib/pq v1.7.1
+	github.com/mattn/go-sqlite3 v2.0.1+incompatible // indirect
+	github.com/mitchellh/mapstructure v1.3.2 // indirect
 	github.com/onsi/ginkgo v1.12.0 // indirect
 	github.com/onsi/gomega v1.9.0 // indirect
-	github.com/pelletier/go-toml v1.6.0 // indirect
+	github.com/pelletier/go-toml v1.8.0 // indirect
 	github.com/silenceper/wechat v2.0.1+incompatible
-	github.com/spf13/afero v1.2.2 // indirect
+	github.com/spf13/afero v1.3.2 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/spf13/viper v1.6.1
-	golang.org/x/crypto v0.0.0-20200109152110-61a87790db17 // indirect
-	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e // indirect
-	golang.org/x/sys v0.0.0-20200331124033-c3d80250170d // indirect
-	golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543 // indirect
-	google.golang.org/appengine v1.6.5 // indirect
-	gopkg.in/go-playground/validator.v9 v9.31.0 // indirect
-	gopkg.in/ini.v1 v1.51.1 // indirect
-	gopkg.in/yaml.v2 v2.2.7 // indirect
+	github.com/spf13/viper v1.7.0
+	golang.org/x/crypto v0.0.0-20200709230013-948cd5f35899 // indirect
+	golang.org/x/sys v0.0.0-20200720211630-cb9d2d5c5666 // indirect
+	golang.org/x/text v0.3.3 // indirect
+	google.golang.org/protobuf v1.25.0 // indirect
+	gopkg.in/ini.v1 v1.57.0 // indirect
 )

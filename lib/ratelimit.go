@@ -5,7 +5,7 @@ import (
 	"time"
 	"wechat/db/redis"
 
-	Redis "github.com/go-redis/redis"
+	Redis "github.com/go-redis/redis/v7"
 )
 
 type Bucket struct {
