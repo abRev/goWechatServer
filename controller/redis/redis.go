@@ -12,8 +12,8 @@ import (
 )
 
 type zsetBody struct {
-	Key     string    `json:"key"`
-	Members []redis.Z `json:"members"`
+	Key     string     `json:"key"`
+	Members []*redis.Z `json:"members"`
 }
 
 // ZsetSet 设置zset数据
@@ -45,9 +45,9 @@ func GetZsetByScore(c *gin.Context) {
 	client := cache.GetDB()
 	var res *redis.ZSliceCmd
 	if body.Order {
-		res = client.ZRangeByScoreWithScores(body.Key, body.Condition)
+		res = client.ZRangeByScoreWithScores(body.Key, &(body.Condition))
 	} else {
-		res = client.ZRevRangeByScoreWithScores(body.Key, body.Condition)
+		res = client.ZRevRangeByScoreWithScores(body.Key, &(body.Condition))
 	}
 	if data, err := res.Result(); err != nil {
 		fmt.Println(err)
