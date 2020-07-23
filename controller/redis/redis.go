@@ -5,6 +5,7 @@ import (
 	"net/http"
 	cache "wechat/db/redis"
 
+	redigo "wechat/db"
 	"wechat/lib"
 
 	"github.com/gin-gonic/gin"
@@ -224,14 +225,14 @@ type bladd struct {
 func BloomAdd(c *gin.Context) {
 	body := &bladd{}
 	c.ShouldBindJSON(&body)
-	userBL := &lib.Bloom{
-		Key: body.Key,
-	}
-	members := []string{
-		body.Member,
-	}
+	// userBL := &lib.Bloom{
+	// 	Key: body.Key,
+	// }
+	// members := []string{
+	// 	body.Member,
+	// }
 
-	if count, err := userBL.MAdd(members); err != nil {
+	if count, err := redigo.BFAdd(body.Key, body.Member); err != nil {
 		fmt.Println("err:", err)
 		c.JSON(http.StatusOK, gin.H{
 			"ok":  true,

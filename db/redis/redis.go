@@ -3,8 +3,6 @@ package redis
 import (
 	"fmt"
 
-	_ "wechat/config"
-
 	"github.com/go-redis/redis/v7"
 	"github.com/spf13/viper"
 )
@@ -12,8 +10,9 @@ import (
 var client *redis.Client
 
 func init() {
+	addr := fmt.Sprintf("%s:%s", viper.GetString("common.redis.host"), viper.GetString("common.redis.port"))
 	client = redis.NewClient(&redis.Options{
-		Addr:     viper.GetString("common.redis.addr"),
+		Addr:     addr,
 		Password: viper.GetString("common.redis.password"),
 		DB:       viper.GetInt("common.redis.db"),
 	})

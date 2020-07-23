@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	_ "wechat/config"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"

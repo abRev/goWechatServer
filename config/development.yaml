@@ -13,7 +13,11 @@ common:
     redis:
         db: 0
         password: ""
-        addr: localhost:6379
+        host: localhost
+        port: 6379
+        maxidle: 3
+        maxactive: 100
+        idleTimeout: 180
     es:
         db: http://localhost
         port: 9200

@@ -3,8 +3,6 @@ package pg
 import (
 	"fmt"
 
-	_ "wechat/config"
-
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"

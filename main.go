@@ -1,6 +1,8 @@
 package main
 
 import (
+	_ "wechat/config"
+	_ "wechat/db"
 	"wechat/routers"
 
 	"github.com/gin-gonic/gin"

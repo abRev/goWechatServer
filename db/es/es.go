@@ -6,8 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	_ "wechat/config"
-
 	"github.com/elastic/go-elasticsearch"
 	"github.com/spf13/viper"
 )
