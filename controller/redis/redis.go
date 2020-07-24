@@ -6,7 +6,6 @@ import (
 	cache "wechat/db/redis"
 
 	redigo "wechat/db"
-	"wechat/lib"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v7"
@@ -134,9 +133,7 @@ type remByScore struct {
 func RemZsetByScore(c *gin.Context) {
 	body := &remByScore{}
 	c.ShouldBindJSON(&body)
-	client := cache.GetDB()
-	res := client.ZRemRangeByScore(body.Key, body.Min, body.Max)
-	if data, err := res.Result(); err != nil {
+	if data, err := redigo.ZRemRangeByScore(body.Key, body.Min, body.Max); err != nil {
 		fmt.Println(err)
 		c.JSON(http.StatusOK, gin.H{
 			"ok":  true,
@@ -159,9 +156,7 @@ type pfAdd struct {
 func PFAdd(c *gin.Context) {
 	body := &pfAdd{}
 	c.ShouldBindJSON(&body)
-	client := cache.GetDB()
-	res := client.PFAdd(body.Key, body.Members)
-	if count, err := res.Result(); err != nil {
+	if count, err := redigo.PfAdd(body.Key, body.Members); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"ok":  true,
 			"err": err,
@@ -177,9 +172,7 @@ func PFAdd(c *gin.Context) {
 // PFCount 查询统计人数
 func PFCount(c *gin.Context) {
 	key := c.Query("key")
-	client := cache.GetDB()
-	res := client.PFCount(key)
-	if count, err := res.Result(); err != nil {
+	if count, err := redigo.PfCount(key); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"ok":  true,
 			"err": err,
@@ -201,9 +194,7 @@ type pfMerge struct {
 func PFMerge(c *gin.Context) {
 	body := &pfMerge{}
 	c.ShouldBindJSON(&body)
-	client := cache.GetDB()
-	res := client.PFMerge(body.Dest, body.Sources...)
-	if count, err := res.Result(); err != nil {
+	if count, err := redigo.PfMerge(body.Dest, body.Sources); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"ok":  true,
 			"err": err,
@@ -225,13 +216,8 @@ type bladd struct {
 func BloomAdd(c *gin.Context) {
 	body := &bladd{}
 	c.ShouldBindJSON(&body)
-	// userBL := &lib.Bloom{
-	// 	Key: body.Key,
-	// }
-	// members := []string{
-	// 	body.Member,
-	// }
-
+	stats := redigo.PoolStats()
+	fmt.Println(stats)
 	if count, err := redigo.BFAdd(body.Key, body.Member); err != nil {
 		fmt.Println("err:", err)
 		c.JSON(http.StatusOK, gin.H{
@@ -254,10 +240,7 @@ type blExists struct {
 func BloomExists(c *gin.Context) {
 	body := &blExists{}
 	c.ShouldBindJSON(&body)
-	userBL := &lib.Bloom{
-		Key: body.Key,
-	}
-	if count, err := userBL.Exists(body.Member); err != nil {
+	if count, err := redigo.BFExists(body.Key, body.Member); err != nil {
 		fmt.Println("err:", err)
 		c.JSON(http.StatusOK, gin.H{
 			"ok":  true,
