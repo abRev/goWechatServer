@@ -1,12 +1,13 @@
-package user
+package routers
 
 import (
 	"fmt"
+	"net/http"
+	"wechat/controller/user"
+
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"wechat/controller/user"
 )
 
 // 校验token，不太好用
@@ -25,7 +26,7 @@ func validate() gin.HandlerFunc {
 		}
 	}
 }
-func InitRouters(router *gin.Engine) {
+func InitUserRouters(router *gin.Engine) {
 	store := cookie.NewStore([]byte("secret"))
 	router.Use(sessions.Sessions("mysession", store))
 	userRouter := router.Group("/user")

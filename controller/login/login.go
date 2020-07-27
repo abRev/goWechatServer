@@ -1,14 +1,15 @@
 package login
 
 import (
-	jwtgo "github.com/dgrijalva/jwt-go"
-	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"time"
 	"wechat/db/pg"
 	"wechat/middleware/jwt"
 	"wechat/model/user"
+
+	jwtgo "github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 )
 
 func Login(c *gin.Context) {
