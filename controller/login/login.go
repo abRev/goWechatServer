@@ -96,15 +96,7 @@ func Register(c *gin.Context) {
 			return
 		}
 		userDB := &user.UserDB{}
-		if err := db.Get(userDB, `SELECT * FROM "user" WHERE "phone"=$1`, userInfo.Phone); err != nil {
-			c.JSON(http.StatusOK, gin.H{
-				"ok":  false,
-				"msg": "查询数据库失败",
-				"err": err.Error(),
-			})
-			return
-		}
-		if userDB != nil {
+		if err := db.Get(userDB, `SELECT * FROM "user" WHERE "phone"=$1`, userInfo.Phone); err == nil {
 			c.JSON(http.StatusOK, gin.H{
 				"ok":  false,
 				"msg": "手机号已经使用",
