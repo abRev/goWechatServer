@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-var dbCon *sqlx.DB
+var DbCon *sqlx.DB
 
 func init() {
 	dialect := viper.GetString("common.pg.dialect")
@@ -26,13 +26,13 @@ func init() {
 	}
 	db.SetMaxIdleConns(idle)
 	db.SetMaxOpenConns(max)
-	dbCon = db
+	DbCon = db
 }
 
 // GetDB 获取数据库链接
 func GetDB() *sqlx.DB {
-	if dbCon != nil {
-		return dbCon
+	if DbCon != nil {
+		return DbCon
 	}
 	return nil
 }

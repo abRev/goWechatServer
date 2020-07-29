@@ -6,6 +6,7 @@ import (
 
 	// "strconv"  // 类型转换使用
 	"net/http"
+	"wechat/db"
 	"wechat/db/pg"
 	"wechat/db/redis"
 	jwt "wechat/middleware/jwt"
@@ -48,7 +49,7 @@ func CreateHome(c *gin.Context) {
 		Birthday: time.Now(),
 		Email:    "f@163.com",
 	}
-	ok := pg.DB.Create(&home)
+	ok := db.DB.Create(&home)
 	c.JSON(http.StatusOK, gin.H{
 		"ok": ok,
 	})
@@ -56,7 +57,7 @@ func CreateHome(c *gin.Context) {
 
 func ListHome(c *gin.Context) {
 	homes := []modelgorm.Home{}
-	pg.DB.Find(&homes)
+	db.DB.Debug().Find(&homes)
 	c.JSON(http.StatusOK, gin.H{
 		"homes": homes,
 	})
