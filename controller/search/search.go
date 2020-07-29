@@ -2,20 +2,14 @@ package search
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
-	"wechat/db/es"
+	"wechat/db"
+
+	"github.com/gin-gonic/gin"
 )
 
 func Info(c *gin.Context) {
-	es := es.GetES()
-	if es == nil {
-		c.JSON(http.StatusOK, gin.H{
-			"status": false,
-			"msg":    "es链接失败",
-		})
-	}
-	res, err := es.Info()
+	res, err := db.Es.Info()
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status": false,

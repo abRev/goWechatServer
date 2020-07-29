@@ -1,11 +1,15 @@
 package db
 
 import (
+	"crypto/tls"
 	"fmt"
 	"log"
+	"net"
+	"net/http"
 	"os"
 	"time"
 
+	"github.com/elastic/go-elasticsearch"
 	"github.com/garyburd/redigo/redis"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -15,6 +19,7 @@ import (
 var (
 	RedisPool *redis.Pool
 	DB        *gorm.DB
+	Es        *elasticsearch.Client
 )
 
 func initRedis() {
@@ -32,7 +37,7 @@ func initRedis() {
 			if err != nil {
 				return nil, err
 			}
-			// if _, err := c.Do("Auth", password); err != nil {
+			// if _, err := c.Do("Auth", password); err != nil {  // 如果redis没有秘密啊 则无需这个步骤
 			// 	c.Close()
 			// 	return nil, err
 			// }
@@ -80,7 +85,30 @@ func initPg() {
 	log.Println("pg: gorm: " + host + ":" + port)
 }
 
+func initES() {
+	cfg := elasticsearch.Config{
+		Addresses: []string{
+			viper.GetString("common.es.db") + ":" + viper.GetString("common.es.port"),
+		},
+		Transport: &http.Transport{
+			MaxIdleConnsPerHost:   10,
+			ResponseHeaderTimeout: time.Second,
+			DialContext:           (&net.Dialer{Timeout: time.Second}).DialContext,
+			TLSClientConfig: &tls.Config{
+				MinVersion: tls.VersionTLS11,
+			},
+		},
+	}
+
+	esCon, err := elasticsearch.NewClient(cfg)
+	if err != nil {
+		panic(err)
+	}
+	Es = esCon
+}
+
 func init() {
 	initPg()
 	initRedis()
+	initES()
 }
