@@ -3,5 +3,5 @@
 docker-compose stop
 docker-compose rm
 docker rm postgres mongo elasticsearch redis go_wechat_server_compose
-sh build.sh compose
+# sh build.sh compose
 docker-compose up -d

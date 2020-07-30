@@ -2,6 +2,8 @@ package home
 
 import (
 	"fmt"
+	"log"
+	"strconv"
 	"time"
 
 	// "strconv"  // 类型转换使用
@@ -9,10 +11,13 @@ import (
 	"wechat/db"
 	"wechat/db/pg"
 	"wechat/db/redis"
+	"wechat/grpc"
 	jwt "wechat/middleware/jwt"
 	"wechat/model/money"
 	"wechat/model/user"
 	"wechat/modelgorm"
+	pb "wechat/pb/helloworld"
+	routeguide "wechat/pb/routeguide"
 
 	"github.com/gin-gonic/gin"
 )
@@ -277,4 +282,51 @@ func GetFile(c *gin.Context) {
 		return
 	}
 	c.String(http.StatusOK, filename)
+}
+
+func GrpcHello(c *gin.Context) {
+	name := c.Query("name")
+	req := &pb.HelloRequest{Name: name}
+	res, err := grpc.HelloClient.SayHello(c, req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"result": fmt.Sprint(res.Message),
+	})
+}
+
+func GrpcRouteFeature(c *gin.Context) {
+	la := c.Query("la")
+	latitude, _ := strconv.ParseInt(la, 10, 32)
+	lo := c.Query("lo")
+	longitude, _ := strconv.ParseInt(lo, 10, 32)
+	point := &routeguide.Point{
+		Latitude:  int32(latitude),
+		Longitude: int32(longitude),
+	}
+	feature, err := grpc.RouteClient.GetFeature(c, point)
+	if err != nil {
+		log.Fatalf("%v.GetFeatures(_) = _, %v: ", grpc.RouteClient, err)
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"feature": feature,
+	})
+}
+
+type routeNode struct {
+	Location *routeguide.Point `json:"location"`
+	Message  string            `json:"message"`
+}
+
+func RunRouteChat(c *gin.Context) {
+	notes := []*routeguide.RouteNote{}
+	if err := c.ShouldBindJSON(&notes); err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"msg": err.Error(),
+		})
+	}
 }

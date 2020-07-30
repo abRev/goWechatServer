@@ -20,4 +20,7 @@ func InitHomeRouters(router *gin.Engine, middleware1 gin.HandlerFunc, middleware
 	homeRouter.GET("/file/:filename", home.GetFile)
 	homeRouter.GET("/home", home.CreateHome)
 	homeRouter.GET("/homes", home.ListHome)
+	homeRouter.GET("/grpc/hello", home.GrpcHello)
+	homeRouter.GET("/grpc/route/feature", home.GrpcRouteFeature)
+	homeRouter.POST("/grpc/route/chat", home.RunRouteChat)
 }
