@@ -2,6 +2,7 @@ package home
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"strconv"
 	"time"
@@ -317,9 +318,10 @@ func GrpcRouteFeature(c *gin.Context) {
 	})
 }
 
-type routeNode struct {
-	Location *routeguide.Point `json:"location"`
-	Message  string            `json:"message"`
+type row struct {
+	Message   string
+	Latitude  int32
+	Longitude int32
 }
 
 func RunRouteChat(c *gin.Context) {
@@ -329,4 +331,39 @@ func RunRouteChat(c *gin.Context) {
 			"msg": err.Error(),
 		})
 	}
+	stream, err := grpc.RouteClient.RouteChat(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"msg": "服务器失联",
+		})
+	}
+	waitc := make(chan struct{})
+	result := []row{}
+	go func() {
+		for {
+			in, err := stream.Recv()
+			if err == io.EOF {
+				close(waitc)
+				return
+			}
+			if err != nil {
+				log.Fatalf("Failed to receive a note : %v", err)
+			}
+			result = append(result, row{
+				Message:   in.Message,
+				Latitude:  in.Location.Latitude,
+				Longitude: in.Location.Longitude,
+			})
+			log.Printf("Got message %s at point(%d, %d)", in.Message, in.Location.Latitude, in.Location.Longitude)
+		}
+	}()
+
+	for _, note := range notes {
+		if err := stream.Send(note); err != nil {
+			log.Fatalf("Failed to send a note: %v", err)
+		}
+	}
+	stream.CloseSend()
+	<-waitc
+	c.JSON(http.StatusOK, result)
 }
