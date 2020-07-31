@@ -5,6 +5,7 @@ import (
 
 	helloworld "wechat/pb/helloworld"
 	routeguide "wechat/pb/routeguide"
+	userService "wechat/pb/userService"
 
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
@@ -12,6 +13,7 @@ import (
 
 var HelloClient helloworld.GreeterClient
 var RouteClient routeguide.RouteGuideClient
+var UserClient userService.UserServiceClient
 
 func init() {
 	host := viper.GetString("grpc.host")
@@ -24,4 +26,5 @@ func init() {
 	}
 	HelloClient = helloworld.NewGreeterClient(conn)
 	RouteClient = routeguide.NewRouteGuideClient(conn)
+	UserClient = userService.NewUserServiceClient(conn)
 }

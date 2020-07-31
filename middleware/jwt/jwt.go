@@ -2,11 +2,11 @@ package jwt
 
 import (
 	"errors"
-	"fmt"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 )
 
 func JWTAuth() gin.HandlerFunc {
@@ -78,7 +78,6 @@ func SetSignKey(key string) string {
 // 生成token
 func (j *JWT) CreateToken(claims CustomClaims) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	fmt.Println("middle: ", token)
 	return token.SignedString(j.SigningKey)
 }
 

@@ -1,12 +1,16 @@
 package login
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"time"
 	"wechat/db/pg"
 	"wechat/middleware/jwt"
 	"wechat/model/user"
+
+	"wechat/grpc"
+	"wechat/pb/userService"
 
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -24,6 +28,16 @@ func Login(c *gin.Context) {
 			})
 			return
 		}
+
+		userfilter := &userService.Userfilter{
+			Phone: liginReq.Phone,
+		}
+		if userInfoFromGrpc, err := grpc.UserClient.GetUser(c, userfilter); err != nil {
+			fmt.Println("err: ", err.Error())
+		} else {
+			fmt.Println("user: ", userInfoFromGrpc)
+		}
+
 		userInfo := &user.UserDB{}
 		log.Println(liginReq.Phone, liginReq.Password)
 		if err := db.Get(userInfo, `SELECT * FROM "user" WHERE "phone"=$1`, liginReq.Phone); err != nil {
