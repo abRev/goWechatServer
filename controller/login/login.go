@@ -1,14 +1,19 @@
 package login
 
 import (
-	jwtgo "github.com/dgrijalva/jwt-go"
-	"github.com/gin-gonic/gin"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
 	"wechat/db/pg"
 	"wechat/middleware/jwt"
 	"wechat/model/user"
+
+	"wechat/grpc"
+	"wechat/pb/userService"
+
+	jwtgo "github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 )
 
 func Login(c *gin.Context) {
@@ -23,6 +28,16 @@ func Login(c *gin.Context) {
 			})
 			return
 		}
+
+		userfilter := &userService.Userfilter{
+			Phone: liginReq.Phone,
+		}
+		if userInfoFromGrpc, err := grpc.UserClient.GetUser(c, userfilter); err != nil {
+			fmt.Println("err: ", err.Error())
+		} else {
+			fmt.Println("user: ", userInfoFromGrpc)
+		}
+
 		userInfo := &user.UserDB{}
 		log.Println(liginReq.Phone, liginReq.Password)
 		if err := db.Get(userInfo, `SELECT * FROM "user" WHERE "phone"=$1`, liginReq.Phone); err != nil {
@@ -95,15 +110,7 @@ func Register(c *gin.Context) {
 			return
 		}
 		userDB := &user.UserDB{}
-		if err := db.Get(userDB, `SELECT * FROM "user" WHERE "phone"=$1`, userInfo.Phone); err != nil {
-			c.JSON(http.StatusOK, gin.H{
-				"ok":  false,
-				"msg": "查询数据库失败",
-				"err": err.Error(),
-			})
-			return
-		}
-		if userDB != nil {
+		if err := db.Get(userDB, `SELECT * FROM "user" WHERE "phone"=$1`, userInfo.Phone); err == nil {
 			c.JSON(http.StatusOK, gin.H{
 				"ok":  false,
 				"msg": "手机号已经使用",

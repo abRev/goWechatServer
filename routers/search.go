@@ -1,11 +1,12 @@
-package search
+package routers
 
 import (
-	"github.com/gin-gonic/gin"
 	"wechat/controller/search"
+
+	"github.com/gin-gonic/gin"
 )
 
-func InitRouters(router *gin.Engine) {
+func InitSearchRouters(router *gin.Engine) {
 	searchRouter := router.Group("/search")
 	searchRouter.GET("/info", search.Info)
 }

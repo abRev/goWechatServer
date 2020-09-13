@@ -1,4 +1,4 @@
-package home
+package routers
 
 import (
 	"wechat/controller/home"
@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func InitRouters(router *gin.Engine, middleware1 gin.HandlerFunc, middleware gin.HandlerFunc) {
+func InitHomeRouters(router *gin.Engine, middleware1 gin.HandlerFunc, middleware gin.HandlerFunc) {
 	homeRouter := router.Group("/home")
 	homeRouter.Use(middleware1)
 	// homeRouter.Use(middleware)
@@ -20,4 +20,7 @@ func InitRouters(router *gin.Engine, middleware1 gin.HandlerFunc, middleware gin
 	homeRouter.GET("/file/:filename", home.GetFile)
 	homeRouter.GET("/home", home.CreateHome)
 	homeRouter.GET("/homes", home.ListHome)
+	homeRouter.GET("/grpc/hello", home.GrpcHello)
+	homeRouter.GET("/grpc/route/feature", home.GrpcRouteFeature)
+	homeRouter.POST("/grpc/route/chat", home.RunRouteChat)
 }

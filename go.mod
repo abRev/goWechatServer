@@ -7,12 +7,13 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/elastic/go-elasticsearch v0.0.0
 	github.com/fsnotify/fsnotify v1.4.9
+	github.com/garyburd/redigo v1.6.0
 	github.com/gin-contrib/sessions v0.0.3
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.3.0 // indirect
 	github.com/go-redis/redis v6.15.8+incompatible // indirect
 	github.com/go-redis/redis/v7 v7.4.0
-	github.com/golang/protobuf v1.4.2 // indirect
+	github.com/golang/protobuf v1.4.2
 	github.com/gorilla/sessions v1.2.0 // indirect
 	github.com/jinzhu/gorm v1.9.15
 	github.com/jmoiron/sqlx v1.2.0
@@ -30,8 +31,11 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.7.0
 	golang.org/x/crypto v0.0.0-20200709230013-948cd5f35899 // indirect
-	golang.org/x/sys v0.0.0-20200720211630-cb9d2d5c5666 // indirect
+	golang.org/x/net v0.0.0-20200707034311-ab3426394381 // indirect
+	golang.org/x/sys v0.0.0-20200728102440-3e129f6d46b1 // indirect
 	golang.org/x/text v0.3.3 // indirect
-	google.golang.org/protobuf v1.25.0 // indirect
+	google.golang.org/genproto v0.0.0-20200729003335-053ba62fc06f // indirect
+	google.golang.org/grpc v1.30.0
+	google.golang.org/protobuf v1.25.0
 	gopkg.in/ini.v1 v1.57.0 // indirect
 )

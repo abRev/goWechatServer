@@ -2,16 +2,23 @@ package home
 
 import (
 	"fmt"
+	"io"
+	"log"
+	"strconv"
 	"time"
 
 	// "strconv"  // 类型转换使用
 	"net/http"
+	"wechat/db"
 	"wechat/db/pg"
 	"wechat/db/redis"
+	"wechat/grpc"
 	jwt "wechat/middleware/jwt"
 	"wechat/model/money"
 	"wechat/model/user"
 	"wechat/modelgorm"
+	pb "wechat/pb/helloworld"
+	routeguide "wechat/pb/routeguide"
 
 	"github.com/gin-gonic/gin"
 )
@@ -48,7 +55,7 @@ func CreateHome(c *gin.Context) {
 		Birthday: time.Now(),
 		Email:    "f@163.com",
 	}
-	ok := pg.DB.Create(&home)
+	ok := db.DB.Create(&home)
 	c.JSON(http.StatusOK, gin.H{
 		"ok": ok,
 	})
@@ -56,7 +63,7 @@ func CreateHome(c *gin.Context) {
 
 func ListHome(c *gin.Context) {
 	homes := []modelgorm.Home{}
-	pg.DB.Find(&homes)
+	db.DB.Debug().Find(&homes)
 	c.JSON(http.StatusOK, gin.H{
 		"homes": homes,
 	})
@@ -276,4 +283,87 @@ func GetFile(c *gin.Context) {
 		return
 	}
 	c.String(http.StatusOK, filename)
+}
+
+func GrpcHello(c *gin.Context) {
+	name := c.Query("name")
+	req := &pb.HelloRequest{Name: name}
+	res, err := grpc.HelloClient.SayHello(c, req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"result": fmt.Sprint(res.Message),
+	})
+}
+
+func GrpcRouteFeature(c *gin.Context) {
+	la := c.Query("la")
+	latitude, _ := strconv.ParseInt(la, 10, 32)
+	lo := c.Query("lo")
+	longitude, _ := strconv.ParseInt(lo, 10, 32)
+	point := &routeguide.Point{
+		Latitude:  int32(latitude),
+		Longitude: int32(longitude),
+	}
+	feature, err := grpc.RouteClient.GetFeature(c, point)
+	if err != nil {
+		log.Fatalf("%v.GetFeatures(_) = _, %v: ", grpc.RouteClient, err)
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"feature": feature,
+	})
+}
+
+type row struct {
+	Message   string
+	Latitude  int32
+	Longitude int32
+}
+
+func RunRouteChat(c *gin.Context) {
+	notes := []*routeguide.RouteNote{}
+	if err := c.ShouldBindJSON(&notes); err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"msg": err.Error(),
+		})
+	}
+	stream, err := grpc.RouteClient.RouteChat(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"msg": "服务器失联",
+		})
+	}
+	waitc := make(chan struct{})
+	result := []row{}
+	go func() {
+		for {
+			in, err := stream.Recv()
+			if err == io.EOF {
+				close(waitc)
+				return
+			}
+			if err != nil {
+				log.Fatalf("Failed to receive a note : %v", err)
+			}
+			result = append(result, row{
+				Message:   in.Message,
+				Latitude:  in.Location.Latitude,
+				Longitude: in.Location.Longitude,
+			})
+			log.Printf("Got message %s at point(%d, %d)", in.Message, in.Location.Latitude, in.Location.Longitude)
+		}
+	}()
+
+	for _, note := range notes {
+		if err := stream.Send(note); err != nil {
+			log.Fatalf("Failed to send a note: %v", err)
+		}
+	}
+	stream.CloseSend()
+	<-waitc
+	c.JSON(http.StatusOK, result)
 }
