@@ -18,5 +18,5 @@ func InitRedisRouter(router *gin.Engine) {
 	redisGroup.POST("/pfmerge", redis.PFMerge)
 	/*----------------------------------------*/
 	redisGroup.POST("/bfadd", redis.BloomAdd)
-	redisGroup.POST("/bfexists", redis.BloomExists)
+	redisGroup.POST("/bfexists", redis.Blo-omExists)
 }
